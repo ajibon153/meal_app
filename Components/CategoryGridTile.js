@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const CategoryGridTile = (props) => {
-  console.log('CategoryGridTile', props);
   return (
     <TouchableOpacity style={styles.gridItem} onPress={props.onSelect}>
       <View
@@ -27,10 +26,6 @@ const styles = StyleSheet.create({
     padding: 15,
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
-
-    // backgroundColor: '#fff',
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
   gridItem: {
     flex: 1,

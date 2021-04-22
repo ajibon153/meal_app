@@ -1,8 +1,10 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 // import CategoryMeals from './CategoryMealsScreen';
 import CategoryGridTile from '../Components/CategoryGridTile';
+import HeaderButton from '../Components/HeaderButton';
 
 import { CATEGORIES } from '../Data/Dummy-data';
 import Colors from '../Constants/Color';
@@ -48,12 +50,21 @@ const CategoriesScreen = (props) => {
   // );
 };
 
-CategoriesScreen.navigationOptions = {
-  headerTitle: 'Meal Categories',
-  headerStyle: {
-    backgroundColor: Colors.primaryColor,
-  },
-  headerTintColor: '#fff',
+CategoriesScreen.navigationOptions = (navData) => {
+  return {
+    headerTitle: 'Meal Categories',
+    headerLeft: (
+      <HeaderButtons HeaderButtonComponent={HeaderButton}>
+        <Item
+          title='Menu'
+          iconName='ios-menu'
+          onPress={() => {
+            navData.navigation.toggleDrawer();
+          }}
+        />
+      </HeaderButtons>
+    ),
+  };
 };
 
 const styles = StyleSheet.create({

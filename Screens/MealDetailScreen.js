@@ -1,40 +1,114 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { MEALS } from '../Data/Dummy-data';
+import React, { useEffect, useCallback } from 'react';
+import {
+  ScrollView,
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  // Button,
+} from 'react-native';
+// import { MEALS } from '../Data/Dummy-data';
+import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import HeaderButton from '../Components/HeaderButton';
+import DefaultText from '../Components/DefaultText';
+import { toogleFavoirute } from '../Store/Actions/Meals';
 
-const MealdDetailScreen = (props) => {
+import { useSelector, useDispatch } from 'react-redux';
+
+const ListItem = (props) => {
   return (
-    <View style={styles.container}>
-      <Text>The Meald Detail Screen !</Text>
-      <Button
-        title='Go Back'
-        onPress={() => {
-          props.navigation.goBack();
-        }}
-      />
-      <Button
-        title='Go Home'
-        onPress={() => {
-          props.navigation.popToTop();
-        }}
-      />
+    <View style={styles.listItem}>
+      <DefaultText>{props.children}</DefaultText>
     </View>
   );
 };
 
+const MealdDetailScreen = (props) => {
+  const availableMeals = useSelector((state) => state.meals.meals);
+  const mealId = props.navigation.getParam('mealId');
+  const currentMealsFavorite = useSelector((state) =>
+    state.meals.favoriteMeals.some((meal) => meal.id === mealId)
+  );
+
+  const selectedMeal = availableMeals.find((meal) => meal.id === mealId);
+
+  const dispatch = useDispatch();
+
+  const toggleFavoriteHandler = useCallback(() => {
+    dispatch(toogleFavoirute(mealId));
+  }, [mealId, dispatch]);
+
+  useEffect(() => {
+    // props.navigation.setParams({ mealTitle: selectedMeal.title });
+    props.navigation.setParams({ toggleFav: toggleFavoriteHandler });
+  }, [selectedMeal, toggleFavoriteHandler]);
+
+  useEffect(() => {
+    props.navigation.setParams({ isFav: currentMealsFavorite });
+  }, [currentMealsFavorite]);
+
+  return (
+    <ScrollView>
+      <Image source={{ uri: selectedMeal.imageUrl }} style={styles.image} />
+      <View style={styles.details}>
+        <DefaultText>{selectedMeal.duration} minute</DefaultText>
+        <DefaultText>{selectedMeal.complexity.toUpperCase()}</DefaultText>
+        <DefaultText>{selectedMeal.affordability.toUpperCase()}</DefaultText>
+      </View>
+      <Text style={styles.title}>Ingredients</Text>
+      {selectedMeal.ingredients.map((ingredient) => (
+        <ListItem key={ingredient}>{ingredient}</ListItem>
+      ))}
+      <Text style={styles.title}>Steps</Text>
+      {selectedMeal.steps.map((step) => (
+        <ListItem key={step}>{step}</ListItem>
+      ))}
+    </ScrollView>
+  );
+};
+
 MealdDetailScreen.navigationOptions = (navigationData) => {
-  const mealId = navigationData.navigation.getParam('mealId');
-  const selectedMeal = MEALS.find((meal) => meal.id === mealId);
-  console.log('selectedMeal', selectedMeal);
-  return { headerTitle: selectedMeal.title };
+  // const mealId = navigationData.navigation.getParam('mealId');
+  const mealTitle = navigationData.navigation.getParam('mealTitle');
+  // const selectedMeal = MEALS.find((meal) => meal.id === mealId);
+  const toggleFavorite = navigationData.navigation.getParam('toggleFav');
+  const isFavorite = navigationData.navigation.getParam('isFav');
+
+  return {
+    headerTitle: mealTitle,
+    headerRight: (
+      <HeaderButtons HeaderButtonComponent={HeaderButton}>
+        <Item
+          title='Favorite'
+          iconName={isFavorite ? 'ios-star' : 'ios-star-outline'}
+          onPress={toggleFavorite}
+        />
+      </HeaderButtons>
+    ),
+  };
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+  image: {
+    width: '100%',
+    height: 200,
+  },
+  details: {
+    flexDirection: 'row',
+    padding: 15,
+    justifyContent: 'space-around',
+  },
+  title: {
+    fontFamily: 'open-sans-bold',
+    fontSize: 22,
+    textAlign: 'center',
+  },
+  listItem: {
+    marginVertical: 10,
+    marginHorizontal: 20,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    padding: 10,
   },
 });
 

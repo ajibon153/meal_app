@@ -4,6 +4,8 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
 import HeaderButton from '../Components/HeaderButton';
 import Colors from '../Constants/Color';
+import { useSelector, useDispatch } from 'react-redux';
+import { setFilters } from '../Store/Actions/Meals';
 
 const FilterSwitch = (props) => {
   return (
@@ -25,6 +27,8 @@ const Filter = (props) => {
   const [isVegan, setIsVegan] = React.useState(false);
   const [isVegetarian, setIsVegetarian] = React.useState(false);
 
+  const dispatch = useDispatch();
+
   const saveFilters = React.useCallback(() => {
     const appliedFilters = {
       GlutenFree: isGlutenFree,
@@ -33,11 +37,12 @@ const Filter = (props) => {
       Vegetarian: isVegetarian,
     };
     console.log('appliedFilters', appliedFilters);
-  }, [isGlutenFree, isLactoseFree, isVegan, isVegetarian]);
+    dispatch(setFilters(appliedFilters));
+  }, [isGlutenFree, isLactoseFree, isVegan, isVegetarian, dispatch]);
 
   React.useEffect(() => {
-    // let getPar = navigation.getParam();
-    // console.log('getPar', getPar);
+    let getPar = navigation.getParam('save');
+    console.log('saveFilters', saveFilters);
     navigation.setParams({
       save: saveFilters,
     });
@@ -88,7 +93,7 @@ Filter.navigationOptions = (navData) => {
           title='Save'
           iconName='ios-save'
           onPress={() => {
-            console.log('setpar s', navData.navigation.getParam('save'));
+            console.log('triger', navData.navigation.getParam('save'));
             navData.navigation.getParam('save');
           }}
         />
